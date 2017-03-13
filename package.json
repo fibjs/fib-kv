@@ -1,6 +1,6 @@
 {
     "name": "fib-kv",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "general key-value store on sql/level/mongo/redis",
     "main": "lib/index.js",
     "repository": "git://github.com/xicilion/fib-kv.git",
