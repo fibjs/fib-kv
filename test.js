@@ -58,7 +58,8 @@ describe("kv", () => {
         () => conn = {});
 
     test_kv('Object opts', {
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = {},
         () => conn = {});
@@ -68,7 +69,8 @@ describe("kv", () => {
         () => conn = {});
 
     test_kv('Map opts', {
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = new collection.Map(),
         () => conn = {});
@@ -78,7 +80,8 @@ describe("kv", () => {
         () => conn.close());
 
     test_kv('LevelDB opts', {
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = db.openLevelDB("test.ldb"),
         () => {
@@ -103,7 +106,8 @@ describe("kv", () => {
             key_size: 32, // default: 32
             value_name: 'test_value', // default: v
             value_size: 256, // default: 256
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = db.openSQLite("test.db"),
         () => {
@@ -129,7 +133,8 @@ describe("kv", () => {
             key_size: 32, // default: 32
             value_name: 'test_value', // default: v
             value_size: 256, // default: 256
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = db.openMySQL("mysql://root@localhost/test"),
         () => {
@@ -147,7 +152,8 @@ describe("kv", () => {
             table_name: 'test', // default: kvs
             key_name: 'test_key', // default: k
             value_name: 'test_value', // default: v
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
         () => {
@@ -163,7 +169,8 @@ describe("kv", () => {
 
     test_kv('Redis opts', {
             table_name: 'test', // default: kvs
-            prefix: 'test_'
+            prefix: 'test_',
+            cache: true
         },
         () => conn = db.openRedis("redis://127.0.0.1"),
         () => {
