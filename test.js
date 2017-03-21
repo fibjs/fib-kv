@@ -6,6 +6,8 @@ var db = require('db');
 var collection = require('collection');
 var fs = require('fs');
 
+var pool = require('fib-pool');
+
 describe("kv", () => {
     var conn;
 
@@ -144,6 +146,14 @@ describe("kv", () => {
             conn.close();
         });
 
+    test_kv('MySQL pool', {},
+        () => conn = pool(() => db.openMySQL("mysql://root@localhost/test")),
+        () => {
+            try {
+                conn(c => c.execute('DROP TABLE kvs;'));
+            } catch (e) {};
+        });
+
     test_kv('MongoDB', {},
         () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
         () => conn.close());
@@ -181,4 +191,4 @@ describe("kv", () => {
         });
 });
 
-test.run(console.DEBUG);
+process.exit(test.run(console.DEBUG));

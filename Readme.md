@@ -17,7 +17,7 @@ npm run ci
 ### var kvs = new kv(conn, opts);
 
 ```JavaScript
-conn: database connection
+conn: database connection or connection factory like fib-pool
 opts: kvs options
 ```
 
