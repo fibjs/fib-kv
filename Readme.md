@@ -49,6 +49,15 @@ var db = require("db");
 var kvs = new kv(db.openLevelDB("test.ldb"));
 ```
 
+fib-pool backend.
+```JavaScript
+var kv = require("fib-kv");
+var db = require("db");
+var pool = require("fib-pool");
+
+var kvs = new kv(pool(() => db.openLevelDB("test.ldb")));
+```
+
 
 ## Methods
 
