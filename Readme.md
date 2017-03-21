@@ -28,7 +28,7 @@ key_name | "k" | x | x | x | √ | √
 value_name | "v" | x | x | x | √ | √ 
 key_size | 32 | x | x | x | x | √ 
 value_size | 256 | x | x | x | x | √ 
-prefix | "test_" | √ | √ | √ | √ | √ 
+prefix | "" | √ | √ | √ | √ | √ 
 cache | false | √ | √ | √ | √ | √ 
 
 Simple example (memory backend).
