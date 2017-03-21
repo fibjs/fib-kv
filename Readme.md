@@ -76,5 +76,8 @@ returns whether a key is set on the store.
 ### kvs.remove(k)
 deletes a key-value pair by key.
 
-### kvs.clear_vache()
+### e = kvs.cache_has(k)
+returns whether a key is set on the cache.
+
+### kvs.cache_clear()
 removes all the key-value pairs in the cache.
