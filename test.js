@@ -2,9 +2,11 @@ var test = require('test');
 test.setup();
 
 var kv = require('./');
+
 var db = require('db');
 var collection = require('collection');
 var fs = require('fs');
+var util = require('util');
 
 var pool = require('fib-pool');
 
@@ -75,6 +77,10 @@ describe("kv", () => {
             cache: true
         },
         () => conn = new collection.Map(),
+        () => conn = {});
+
+    test_kv('LruCache', {},
+        () => conn = new util.LruCache(65536),
         () => conn = {});
 
     test_kv('LevelDB', {},
@@ -178,7 +184,7 @@ describe("kv", () => {
         () => conn.close());
 
     test_kv('Redis opts', {
-            table_name: 'test', // default: kvs
+            table_name: '', // default: kvs
             prefix: 'test_',
             cache: true
         },

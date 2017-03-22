@@ -21,15 +21,17 @@ conn: database connection or connection factory like fib-pool
 opts: kvs options
 ```
 
-opts | default | mem | leveldb | redis | mongodb | sql
----  |    ---  | --- |   ---   |   ---   |  ---  | ---
-table_name | "kvs" | x | x | √ | √ | √ 
-key_name | "k" | x | x | x | √ | √ 
-value_name | "v" | x | x | x | √ | √ 
-key_size | 32 | x | x | x | x | √ 
-value_size | 256 | x | x | x | x | √ 
-prefix | "" | √ | √ | √ | √ | √ 
-cache | false | √ | √ | √ | √ | √ 
+opts | default | object/Map | LruCache | LevelDB | Redis | MongoDB |  SQLite/MySQL
+---  |   ---   | --- |   ----   |   ---   |  ---  |   ---   | ---
+table_name | "kvs" | x | x | x | √ | √ | √ 
+key_name | "k" | x | x | x | x | √ | √ 
+value_name | "v" | x | x | x | x | √ | √ 
+key_size | 32 | x | x | x | x | x | √ 
+value_size | 256 | x | x | x | x | x | √ 
+prefix | "" | √ | √ | √ | √ | √ | √ 
+cache | false | √ | √ | √ | √ | √ | √ 
+cache_size | 65536 | √ | √ | √ | √ | √ | √ 
+cache_timeout(ms) | 60000 | √ | √ | √ | √ | √ | √ 
 
 Simple example (memory backend).
 ```JavaScript
