@@ -3,9 +3,9 @@
     "version": "1.0.3",
     "description": "general key-value store on sql/level/mongo/redis for fibjs",
     "main": "lib/index.js",
-    "repository": "git://github.com/xicilion/fib-kv.git",
+    "repository": "git://github.com/fibjs/fib-kv.git",
     "author": "Liu Hu <lion@9465.net>",
-    "homepage": "https://github.com/xicilion/fib-kv",
+    "homepage": "https://github.com/fibjs/fib-kv",
     "license": "MIT",
     "keywords": [
         "key",
