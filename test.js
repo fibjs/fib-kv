@@ -126,75 +126,77 @@ describe("kv", () => {
             } catch (e) {};
         });
 
-    test_kv('MySQL', {},
-        () => conn = db.openMySQL("mysql://root@localhost/test"),
-        () => {
-            try {
-                conn.execute('DROP TABLE kvs;');
-            } catch (e) {};
-            conn.close();
-        });
+    if (process.argv.indexOf('full') >= 0) {
+        test_kv('MySQL', {},
+            () => conn = db.openMySQL("mysql://root@localhost/test"),
+            () => {
+                try {
+                    conn.execute('DROP TABLE kvs;');
+                } catch (e) {};
+                conn.close();
+            });
 
-    test_kv('MySQL opts', {
-            table_name: 'test', // default: kvs
-            key_name: 'test_key', // default: k
-            key_size: 32, // default: 32
-            value_name: 'test_value', // default: v
-            value_size: 256, // default: 256
-            prefix: 'test_',
-            cache: true
-        },
-        () => conn = db.openMySQL("mysql://root@localhost/test"),
-        () => {
-            try {
-                conn.execute('DROP TABLE test;');
-            } catch (e) {};
-            conn.close();
-        });
+        test_kv('MySQL opts', {
+                table_name: 'test', // default: kvs
+                key_name: 'test_key', // default: k
+                key_size: 32, // default: 32
+                value_name: 'test_value', // default: v
+                value_size: 256, // default: 256
+                prefix: 'test_',
+                cache: true
+            },
+            () => conn = db.openMySQL("mysql://root@localhost/test"),
+            () => {
+                try {
+                    conn.execute('DROP TABLE test;');
+                } catch (e) {};
+                conn.close();
+            });
 
-    test_kv('MySQL pool', {},
-        () => conn = pool(() => db.openMySQL("mysql://root@localhost/test")),
-        () => {
-            try {
-                conn(c => c.execute('DROP TABLE kvs;'));
-            } catch (e) {};
-        });
+        test_kv('MySQL pool', {},
+            () => conn = pool(() => db.openMySQL("mysql://root@localhost/test")),
+            () => {
+                try {
+                    conn(c => c.execute('DROP TABLE kvs;'));
+                } catch (e) {};
+            });
 
-    test_kv('MongoDB', {},
-        () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
-        () => conn.close());
+        test_kv('MongoDB', {},
+            () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
+            () => conn.close());
 
-    test_kv('MongoDB opts', {
-            table_name: 'test', // default: kvs
-            key_name: 'test_key', // default: k
-            value_name: 'test_value', // default: v
-            prefix: 'test_',
-            cache: true
-        },
-        () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
-        () => {
-            try {
-                conn.getCollection('test').drop();
-            } catch (e) {};
-            conn.close();
-        });
+        test_kv('MongoDB opts', {
+                table_name: 'test', // default: kvs
+                key_name: 'test_key', // default: k
+                value_name: 'test_value', // default: v
+                prefix: 'test_',
+                cache: true
+            },
+            () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
+            () => {
+                try {
+                    conn.getCollection('test').drop();
+                } catch (e) {};
+                conn.close();
+            });
 
-    test_kv('Redis', {},
-        () => conn = db.openRedis("redis://127.0.0.1"),
-        () => conn.close());
+        test_kv('Redis', {},
+            () => conn = db.openRedis("redis://127.0.0.1"),
+            () => conn.close());
 
-    test_kv('Redis opts', {
-            table_name: '', // default: kvs
-            prefix: 'test_',
-            cache: true
-        },
-        () => conn = db.openRedis("redis://127.0.0.1"),
-        () => {
-            try {
-                conn.del('test');
-            } catch (e) {};
-            conn.close();
-        });
+        test_kv('Redis opts', {
+                table_name: '', // default: kvs
+                prefix: 'test_',
+                cache: true
+            },
+            () => conn = db.openRedis("redis://127.0.0.1"),
+            () => {
+                try {
+                    conn.del('test');
+                } catch (e) {};
+                conn.close();
+            });
+    }
 });
 
 process.exit(test.run(console.DEBUG));
