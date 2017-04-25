@@ -21,17 +21,21 @@ conn: database connection or connection factory like fib-pool
 opts: kvs options
 ```
 
-opts | default | object/Map | LruCache | LevelDB | Redis | MongoDB |  SQLite/MySQL
----  |   ---   | --- |   ----   |   ---   |  ---  |   ---   | ---
-table_name | "kvs" | x | x | x | √ | √ | √ 
-key_name | "k" | x | x | x | x | √ | √ 
-value_name | "v" | x | x | x | x | √ | √ 
-key_size | 32 | x | x | x | x | x | √ 
-value_size | 256 | x | x | x | x | x | √ 
-prefix | "" | √ | √ | √ | √ | √ | √ 
-cache | false | √ | √ | √ | √ | √ | √ 
-cache_size | 65536 | √ | √ | √ | √ | √ | √ 
-cache_timeout(ms) | 60000 | √ | √ | √ | √ | √ | √ 
+| opts                 | default | object/Map | LruCache | LevelDB | Redis | MongoDB | SQLite/MySQL |
+|----------------------|---------|------------|----------|---------|-------|---------|--------------|
+| table_name           |   "kvs" | x          | x        | x       | √     | √       | √            |
+| key_name             |     "k" | x          | x        | x       | x     | √       | √            |
+| value_name           |     "v" | x          | x        | x       | x     | √       | √            |
+| key_size             |      32 | x          | x        | x       | x     | x       | √            |
+| value_size           |     256 | x          | x        | x       | x     | x       | √            |
+| cleanup_interval(ms) |   60000 | x          | x        | x       | x     | x       | √            |
+| timeout(ms)          |       0 | x          | √        | x       | √     | √       | √            |
+| prefix               |      "" | √          | √        | √       | √     | √       | √            |
+| cache                |   false | √          | √        | √       | √     | √       | √            |
+| cache_size           |   65536 | √          | √        | √       | √     | √       | √            |
+| cache_timeout(ms)    |   60000 | √          | √        | √       | √     | √       | √            |
+
+A key will not expire if `timeout` is less than or equal to 0.
 
 Simple example (memory backend).
 ```JavaScript
@@ -74,6 +78,12 @@ stores a key-value pair.
 
 ### e = kvs.has(k)
 returns whether a key is set on the store.
+
+### e = kvs.keys()
+returns all keys in the store.
+
+### e = kvs.renew(k)
+renews TTL for an unexpired key.
 
 ### kvs.remove(k)
 deletes a key-value pair by key.
