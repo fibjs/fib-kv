@@ -10,6 +10,17 @@ var util = require('util');
 
 var pool = require('fib-pool');
 
+var coroutine = require('coroutine');
+var rc = require('process').run;
+var conf = {
+    user: 'username',
+    password: 'password',
+    database: 'test',
+};
+
+// The TTL should be large enough considering delays of operations.
+var ms = 500; // 500 milliseconds
+
 describe("kv", () => {
     var conn;
 
@@ -57,6 +68,51 @@ describe("kv", () => {
         });
     }
 
+    function test_timeout(name, opts, _before, _after) {
+        describe(name, () => {
+            var kv_db;
+
+            before(_before);
+            after(_after);
+
+            it('setup', () => {
+                kv_db = new kv(conn, opts);
+                kv_db.setup();
+            });
+
+            it('timeout/renew', function() {
+                var ns = ms * 0.5 + 1;
+
+                kv_db.set('a', 'test a');
+                coroutine.sleep(ns);
+                assert.equal(kv_db.get('a'), 'test a');
+
+                kv_db.renew('a');
+                coroutine.sleep(ns);
+                assert.equal(kv_db.get('a'), 'test a');
+
+                coroutine.sleep(ns);
+                assert.equal(kv_db.get('a'), null);
+            });
+
+            it('keys', function() {
+                var ns = ms * 0.5 + 1;
+
+                kv_db.set('a', 'test a');
+                coroutine.sleep(ns);
+                kv_db.set('b', 'test b');
+
+                assert.equal(kv_db.keys().length, 2);
+
+                coroutine.sleep(ns);
+                assert.equal(kv_db.keys().length, 1);
+
+                coroutine.sleep(ns);
+                assert.equal(kv_db.keys().length, 0);
+            });
+        });
+    }
+
     test_kv('Object', {},
         () => conn = {},
         () => conn = {});
@@ -83,6 +139,10 @@ describe("kv", () => {
         () => conn = new util.LruCache(65536),
         () => conn = {});
 
+    test_timeout('LruCache timeout', {},
+        () => conn = new util.LruCache(65536, ms),
+        () => conn = {});
+
     test_kv('LevelDB', {},
         () => conn = db.openLevelDB("test.ldb"),
         () => conn.close());
@@ -106,7 +166,11 @@ describe("kv", () => {
 
     test_kv('SQLite', {},
         () => conn = db.openSQLite("test.db"),
-        () => conn.close());
+        () => {conn.close()
+           try {
+               fs.unlink("test.db");
+           } catch (e) {};
+        });
 
     test_kv('SQLite opts', {
             table_name: 'test', // default: kvs
@@ -116,6 +180,12 @@ describe("kv", () => {
             value_size: 256, // default: 256
             prefix: 'test_',
             cache: true
+        },
+        () => conn = db.openSQLite("test.db"),
+        () => conn.close());
+
+    test_timeout('SQLite timeout', {
+            timeout: ms
         },
         () => conn = db.openSQLite("test.db"),
         () => {
@@ -128,7 +198,7 @@ describe("kv", () => {
 
     if (process.argv.indexOf('full') >= 0) {
         test_kv('MySQL', {},
-            () => conn = db.openMySQL("mysql://root@localhost/test"),
+            () => conn = db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database),
             () => {
                 try {
                     conn.execute('DROP TABLE kvs;');
@@ -145,7 +215,7 @@ describe("kv", () => {
                 prefix: 'test_',
                 cache: true
             },
-            () => conn = db.openMySQL("mysql://root@localhost/test"),
+            () => conn = db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database),
             () => {
                 try {
                     conn.execute('DROP TABLE test;');
@@ -153,17 +223,72 @@ describe("kv", () => {
                 conn.close();
             });
 
+        test_timeout('MySQL timeout', {
+                timeout: ms
+            },
+            () => conn = db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database),
+            () => {
+                try {
+                    conn.execute('DROP TABLE kvs;');
+                } catch (e) {};
+                conn.close();
+            });
+
         test_kv('MySQL pool', {},
-            () => conn = pool(() => db.openMySQL("mysql://root@localhost/test")),
+            () => conn = pool(() => db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database)),
             () => {
                 try {
                     conn(c => c.execute('DROP TABLE kvs;'));
                 } catch (e) {};
             });
 
+        test_timeout('MySQL pool timeout', {
+                timeout: ms
+            },
+            () => conn = pool(() => db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database)),
+            () => {
+                try {
+                    conn(c => c.execute('DROP TABLE kvs;'));
+                } catch (e) {};
+            });
+
+        test_kv('Redis', {},
+            () => conn = db.openRedis("redis://127.0.0.1"),
+            () => {
+                try {
+                    conn.del('kvs');
+                } catch (e) {};
+                conn.close();
+            });
+
+        test_kv('Redis opts', {
+                table_name: 'test', // default: kvs
+                prefix: 'test_',
+                cache: true
+            },
+            () => conn = db.openRedis("redis://127.0.0.1"),
+            () => {
+                try {
+                    conn.del('test');
+                } catch (e) {};
+                conn.close();
+            });
+
+        test_timeout('Redis timeout', {
+                table_name: '',
+                timeout: ms
+            },
+            () => conn = db.openRedis("redis://127.0.0.1"),
+            () => { conn.close(); });
+
         test_kv('MongoDB', {},
             () => conn = db.openMongoDB("mongodb://127.0.0.1/test"),
-            () => conn.close());
+            () => {
+                try {
+                    conn.getCollection('kvs').drop();
+                } catch (e) {};
+                conn.close();
+            });
 
         test_kv('MongoDB opts', {
                 table_name: 'test', // default: kvs
@@ -180,22 +305,64 @@ describe("kv", () => {
                 conn.close();
             });
 
-        test_kv('Redis', {},
-            () => conn = db.openRedis("redis://127.0.0.1"),
-            () => conn.close());
+        describe('MongoDB timeout', () => {
+            var kv_db;
+            var ms = 30000; // ms should be great than 2000 here
 
-        test_kv('Redis opts', {
-                table_name: '', // default: kvs
-                prefix: 'test_',
-                cache: true
-            },
-            () => conn = db.openRedis("redis://127.0.0.1"),
-            () => {
+            before(() => conn = db.openMongoDB("mongodb://127.0.0.1/test"));
+            after(() => {
                 try {
-                    conn.del('test');
+                    conn.getCollection('kvs').drop();
                 } catch (e) {};
                 conn.close();
             });
+
+            it('setup', () => {
+                var opts = { timeout: ms };
+                kv_db = new kv(conn, opts);
+                kv_db.setup();
+            });
+
+            it('timeout/renew/keys', function() {
+
+                kv_db.set('a', 'test a');
+                coroutine.sleep(1000);
+                kv_db.set('b', 'test b');
+
+                assert.equal(kv_db.keys().length, 2);
+
+                var timer = ms + 60000;
+                while (timer -= 1000) {
+                    rc('echo', ['-ne', '\r', timer/1000, 'seconds left to timeout (1/3)    ']);
+                    coroutine.sleep(1000);
+                    if (!kv_db.get('a'))
+                        break;
+                    kv_db.renew('b');
+                }
+                rc('echo', ['-e', '\r', timer/1000, 'seconds left to timeout (1/3)    ']);
+
+                assert.equal(kv_db.keys().length, 1);
+
+                timer = ms;
+                while (timer -= 1000) {
+                    rc('echo', ['-ne', '\r', timer/1000, 'seconds left to timeout (2/3)    ']);
+                    coroutine.sleep(1000);
+                }
+                rc('echo', ['-e', '\r', timer/1000, 'seconds left to timeout (2/3)    ']);
+                assert.equal(kv_db.get('b'), 'test b');
+
+                timer = 60000;
+                while (timer -= 1000) {
+                    rc('echo', ['-ne', '\r', timer/1000, 'seconds left to timeout (3/3)    ']);
+                    coroutine.sleep(1000);
+                }
+                rc('echo', ['-e', '\r', timer/1000, 'seconds left to timeout (3/3)    ']);
+                assert.equal(kv_db.get('b'), null);
+                assert.equal(kv_db.keys().length, 0);
+            });
+
+        });
+
     }
 });
 
