@@ -45,7 +45,7 @@ describe("kv", () => {
             });
 
             it('get not exists', function() {
-                assert.equal(kv_db.get('a1'), null);
+                assert.ok(kv_db.get('none') === null, `expected ${kv_db.get('none')} to be null`);
             });
 
             it('set exists key', function() {
