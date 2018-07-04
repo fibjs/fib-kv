@@ -4,19 +4,44 @@ test.setup();
 var kv = require('./');
 
 var db = require('db');
-var collection = require('collection');
+var collection = {}
+try {
+    // very old version
+    collection = require('collection')
+} catch (e) {
+    console.warn('no orignal module collection')
+    // new version
+    collection = {
+        Map: Map
+    }
+}
+
 var fs = require('fs');
+var path = require('path');
 var util = require('util');
 
 var pool = require('fib-pool');
 
 var coroutine = require('coroutine');
 var rc = require('process').run;
-var conf = {
+
+var localCfg = {};
+var localCfgFilename = './config.local.js'
+var localCfgPath = path.resolve(__dirname, localCfgFilename)
+if (fs.exists(localCfgPath)) {
+    try {
+        localCfg = require('./config.local')
+        // JSON.parse(fs.readTextFile())
+    } catch (e) {
+        console.log('require local config file failure', e)
+        localCfg = {}
+    }
+}
+var conf = util.extend({
     user: 'username',
     password: 'password',
     database: 'test',
-};
+}, localCfg);
 
 // The TTL should be large enough considering delays of operations.
 var ms = 500; // 500 milliseconds
@@ -45,7 +70,7 @@ describe("kv", () => {
             });
 
             it('get not exists', function() {
-                assert.ok(kv_db.get('none') === null, `expected ${kv_db.get('none')} to be null`);
+                assert.ok(kv_db.get('none') === null, `expect ${kv_db.get('none')} to be null`);
             });
 
             it('set exists key', function() {
@@ -103,12 +128,15 @@ describe("kv", () => {
                 kv_db.set('b', 'test b');
 
                 assert.equal(kv_db.keys().length, 2);
+                assert.deepEqual(kv_db.keys().sort(), ['a', 'b'].sort())
 
                 coroutine.sleep(ns);
                 assert.equal(kv_db.keys().length, 1);
+                assert.deepEqual(kv_db.keys(), ['b'])
 
                 coroutine.sleep(ns);
                 assert.equal(kv_db.keys().length, 0);
+                assert.deepEqual(kv_db.keys(), [])
             });
         });
     }
