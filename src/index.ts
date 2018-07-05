@@ -1,6 +1,9 @@
+import { FibKVOptions } from "../@types";
+
 var util = require('util');
 var utils = require('./utils');
-var backendUtils = require('./backend/_utils');
+var backendUtils = require('./backend/_utils')
+
 var backends = {
     Object: require('./backend/Object'),
     Map: require('./backend/Map'),
@@ -11,22 +14,27 @@ var backends = {
     SQLite: require('./backend/sql'),
     MySQL: require('./backend/sql')
 };
+
 function backend(conn) {
     var t = Object.prototype.toString.call(conn);
-    var type = t.substr(8, t.length - 9);
+    var type = t.substr(8, t.length - 9)
     if (backendUtils.isMapNative() && conn instanceof Map) {
-        type = 'Map';
+        type = 'Map'
     }
+
     var _back = backends[type];
     return _back || conn._back || conn;
 }
-function FibKV(conn, opts = {}) {
+
+function FibKV(conn, opts: FibKVOptions = {}) {
     var cache;
     if (opts.cache) {
-        cache = new util.LruCache(utils.cache_size(opts), utils.cache_timeout(opts));
+        cache = new util.LruCache(utils.cache_size(opts),
+            utils.cache_timeout(opts));
         cache.keys = () => Object.keys(cache.toJSON());
         cache.renew = k => cache.set(k, cache.get(k));
     }
+
     if (typeof conn === 'function') {
         util.extend(this, {
             setup: () => conn(utils.pool_name(opts), c => backend(c).setup(c, opts)),
@@ -62,9 +70,9 @@ function FibKV(conn, opts = {}) {
             cache_has: k => cache && cache.has(utils.prefix_key(k, opts)),
             cache_clear: () => cache && cache.clear()
         });
-    }
-    else {
+    } else {
         var _back = backend(conn);
+
         util.extend(this, {
             setup: () => {
                 _back.setup(conn, opts);
@@ -101,4 +109,5 @@ function FibKV(conn, opts = {}) {
         });
     }
 }
-module.exports = FibKV;
+
+export = FibKV;
