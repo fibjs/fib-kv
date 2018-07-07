@@ -61,6 +61,18 @@ describe("kv", () => {
                 kv_db.setup();
             });
 
+            if (['BLOB', 'LONGBLOB', 'MEDIUMBLOB', 'TINYBLOB'].includes(opts.sql_value_type)) {
+
+                oit('blob', function () {
+                    kv_db = new kv(conn, opts);
+                    kv_db.setup();
+
+                    kv_db.set('a', 'test a');
+                    assert.deepEqual(kv_db.get('a'), new Buffer('test a'));
+                    assert.equal(kv_db.get('a'), 'test a');
+                })
+            }
+
             it('get/set', () => {
                 kv_db.set('a', 'test a');
                 assert.equal(kv_db.get('a'), 'test a');
@@ -208,6 +220,13 @@ describe("kv", () => {
             value_size: 256, // default: 256
             prefix: 'test_',
             cache: true
+        },
+        () => conn = db.openSQLite("test.db"),
+        () => conn.close());
+
+    test_kv('SQLite blob value', {
+            table_name: 'test_blob', // default: kvs
+            sql_value_type: 'BLOB' 
         },
         () => conn = db.openSQLite("test.db"),
         () => conn.close());
