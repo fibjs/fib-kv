@@ -24,18 +24,14 @@ function sql(opts, method) {
 
     if (!sqls)
         sqls = opts.sqls = {
-            get: 'SELECT ' + utils.value_name(opts) + ' FROM ' + utils.table_name(opts) +
-                ' WHERE ' + utils.key_name(opts) + ' = ?' + _v(opts, ' and _timestamp >= ?') + ';',
-            set: 'REPLACE INTO ' + utils.table_name(opts) + ' VALUES(?,?' + _v(opts, ',?') + ');',
-            has: 'SELECT 1 FROM ' + utils.table_name(opts) + ' WHERE ' +
-                utils.key_name(opts) + ' = ?' + _v(opts, ' and _timestamp >= ?') + ';',
-            keys: 'SELECT ' + utils.key_name(opts) + ' FROM ' + utils.table_name(opts) +
-                _v(opts, ' WHERE _timestamp >= ?') + ';',
-            renew: 'UPDATE ' + utils.table_name(opts) + ' SET _timestamp = ? WHERE ' +
-                utils.key_name(opts) + ' = ?;',
-            remove: 'DELETE FROM ' + utils.table_name(opts) + ' WHERE ' +
-                utils.key_name(opts) + ' = ?;',
-            cleanup: 'DELETE FROM ' + utils.table_name(opts) + ' WHERE _timestamp < ?;',
+            get: `SELECT ${utils.value_name(opts)} FROM ${utils.table_name(opts)} WHERE ${utils.key_name(opts)} = ?${_v(opts, ` and _timestamp >= ?`)};`,
+            set: `REPLACE INTO ${utils.table_name(opts)} VALUES(?,?${_v(opts, `,?`)});`,
+            has: `SELECT 1 FROM ${utils.table_name(opts)} WHERE ` +
+                `${utils.key_name(opts)} = ?${_v(opts, ` and _timestamp >= ?`)};`,
+            keys: `SELECT ${utils.key_name(opts)} FROM ${utils.table_name(opts)}${_v(opts, ` WHERE _timestamp >= ?`)};`,
+            renew: `UPDATE ${utils.table_name(opts)} SET _timestamp = ? WHERE ${utils.key_name(opts)} = ?;`,
+            remove: `DELETE FROM ${utils.table_name(opts)} WHERE ${utils.key_name(opts)} = ?;`,
+            cleanup: `DELETE FROM ${utils.table_name(opts)} WHERE _timestamp < ?;`,
         }
 
     return sqls[method];
@@ -43,10 +39,10 @@ function sql(opts, method) {
 
 module.exports = {
     setup: (conn, opts: FibKVNS.FibKVOptions) => {
-        var _sql = 'CREATE TABLE IF NOT EXISTS ' + utils.table_name(opts) + '(' +
-            utils.key_name(opts) + ' VARCHAR(' + utils.key_size(opts) + ') PRIMARY KEY, ' +
-            utils.value_name(opts) + ` ${utils.sql_value_type(opts)}(` + utils.value_size(opts) + ')' +
-            _v(opts, ', _timestamp BIGINT') + ');';
+        var _sql = `CREATE TABLE IF NOT EXISTS ${utils.table_name(opts)}(` +
+            `${utils.key_name(opts)} VARCHAR(${utils.key_size(opts)}) PRIMARY KEY, ` +
+            `${utils.value_name(opts)} ${utils.sql_value_type(opts)}(${utils.value_size(opts)})` +
+            `${_v(opts, ', _timestamp BIGINT')});`;
 
         conn.execute(_sql);
 
