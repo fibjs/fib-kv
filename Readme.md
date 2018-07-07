@@ -34,10 +34,22 @@ opts: kvs options
 | cache                |   false | √          | √        | √       | √     | √       | √            |
 | cache_size           |   65536 | √          | √        | √       | √     | √       | √            |
 | cache_timeout(ms)    |   60000 | √          | √        | √       | √     | √       | √            |
+| sql_value_type       |   60000 | x          | x        | x       | x     | x       | √            |
+
+**NOTICE** sql_value_type is one of below:
+- TINYBLOB
+- BLOB
+- MEDIUMBLOB
+- LONGBLOB
+- TINYTEXT
+- TEXT
+- MEDIUMTEXT
+- LONGTEXT
+- VARCHAR
 
 A key will not expire if `timeout` is less than or equal to 0.
 
-Simple example (memory backend).
+#### Simple example (memory backend).
 ```JavaScript
 var kv = require("fib-kv");
 
@@ -47,7 +59,7 @@ var kvs = new kv({
 });
 ```
 
-LevelDB backend.
+#### LevelDB backend.
 ```JavaScript
 var kv = require("fib-kv");
 var db = require("db");
@@ -55,7 +67,7 @@ var db = require("db");
 var kvs = new kv(db.openLevelDB("test.ldb"));
 ```
 
-fib-pool backend.
+#### fib-pool backend.
 ```JavaScript
 var kv = require("fib-kv");
 var db = require("db");

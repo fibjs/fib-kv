@@ -1,5 +1,9 @@
 declare namespace FibKVNS {
     type ms = number
+    type SQL_VALUE_TYPE = 
+        'TINYBLOB' | 'BLOB' | 'MEDIUMBLOB' | 'LONGBLOB' |
+        'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT' |
+        'VARCHAR'
 
     interface FibKVOptions {
         table_name?: string
@@ -7,12 +11,15 @@ declare namespace FibKVNS {
         value_name?: string
         key_size?: number
         value_size?: number
+        pool_name?: string
         cleanup_interval?: ms
         timeout?: ms
         prefix?: string
         cache?: boolean
         cache_size?: number
         cache_timeout?: ms
+
+        sql_value_type?: SQL_VALUE_TYPE
     }
 
     type FibKVValueType = string | any | null
