@@ -1,3 +1,4 @@
+var util = require('util');
 var test = require('test');
 test.setup();
 
@@ -68,6 +69,9 @@ describe("kv", () => {
                     kv_db.setup();
 
                     kv_db.set('a', 'test a');
+                    assert.isTrue(
+                        util.isBuffer(kv_db.get('a'))
+                    )
                     assert.deepEqual(kv_db.get('a'), new Buffer('test a'));
                     assert.equal(kv_db.get('a'), 'test a');
                 })
@@ -267,6 +271,18 @@ describe("kv", () => {
                 try {
                     conn.execute('DROP TABLE test;');
                 } catch (e) {};
+                conn.close();
+            });
+
+        test_kv('MySQL opts blob', {
+                table_name: 'test_blob', // default: kvs
+                sql_value_type: 'BLOB'
+            },
+            () => conn = db.openMySQL('mysql://' + conf.user + ':' + conf.password + '@localhost/' + conf.database),
+            () => {
+                try {
+                    conn.execute('DROP TABLE test_blob;');
+                } catch (e) { };
                 conn.close();
             });
 
