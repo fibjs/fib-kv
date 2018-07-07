@@ -1,5 +1,3 @@
-import { FibKVOptions } from "../@types";
-
 var util = require('util');
 var utils = require('./utils');
 var backendUtils = require('./backend/_utils')

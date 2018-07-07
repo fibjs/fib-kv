@@ -1,7 +1,6 @@
-import FibKVNS from '../../'
 import utils = require('../utils');
 
-function _v(opts: FibKVNS.FibKVOptions, value) {
+function _v(opts: FibKVOptions, value) {
     return utils.timeout(opts) > 0 ? value : '';
 }
 
@@ -38,7 +37,7 @@ function sql(opts, method) {
 }
 
 module.exports = {
-    setup: (conn, opts: FibKVNS.FibKVOptions) => {
+    setup: (conn, opts: FibKVOptions) => {
         var _sql = `CREATE TABLE IF NOT EXISTS ${utils.table_name(opts)}(` +
             `${utils.key_name(opts)} VARCHAR(${utils.key_size(opts)}) PRIMARY KEY, ` +
             `${utils.value_name(opts)} ${utils.sql_value_type(opts)}(${utils.value_size(opts)})` +
@@ -57,16 +56,16 @@ module.exports = {
             }, utils.cleanup_interval(opts));
         }
     },
-    get: (conn, opts: FibKVNS.FibKVOptions, k: string) => {
+    get: (conn, opts: FibKVOptions, k: string) => {
         var rs = exec(conn, sql(opts, 'get'), k,
                       utils.timeout(opts) > 0 ? Date.now() - utils.timeout(opts) : undefined);
         return rs.length ? rs[0][utils.value_name(opts)] : null;
     },
-    set: (conn, opts: FibKVNS.FibKVOptions, k: string, v) => exec(conn, sql(opts, 'set'), k, v,
+    set: (conn, opts: FibKVOptions, k: string, v) => exec(conn, sql(opts, 'set'), k, v,
                                     utils.timeout(opts) > 0 ? Date.now() : undefined),
-    has: (conn, opts: FibKVNS.FibKVOptions, k: string) => exec(conn, sql(opts, 'has'), k,
+    has: (conn, opts: FibKVOptions, k: string) => exec(conn, sql(opts, 'has'), k,
                                  utils.timeout(opts) > 0 ? Date.now() - utils.timeout(opts) : undefined).length > 0,
-    keys: (conn, opts: FibKVNS.FibKVOptions) => {
+    keys: (conn, opts: FibKVOptions) => {
         var _keys = exec(
             conn, sql(opts, 'keys'),
             utils.timeout(opts) > 0 ? Date.now() - utils.timeout(opts) : undefined
@@ -74,7 +73,7 @@ module.exports = {
 
         return _keys
     },
-    renew: (conn, opts: FibKVNS.FibKVOptions, k: string) => utils.timeout(opts) > 0 ?
+    renew: (conn, opts: FibKVOptions, k: string) => utils.timeout(opts) > 0 ?
         conn.execute(sql(opts, 'renew'), Date.now(), k) : undefined,
-    remove: (conn, opts: FibKVNS.FibKVOptions, k: string) => conn.execute(sql(opts, 'remove'), k),
+    remove: (conn, opts: FibKVOptions, k: string) => conn.execute(sql(opts, 'remove'), k),
 };
