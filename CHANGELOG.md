@@ -1,7 +1,18 @@
 
-v1.2.0 / 2018-07-05
+v1.3.0 / 2018-07-08
 ==================
 
+  * add test case for sql_value_type.
+  * better types.
+  * Merge pull request #5 from richardo2016/master
+  * all joint-sql to string template.
+  * support opts.sql_value_type
+  * Merge pull request #4 from richardo2016/master
+
+v1.2.0 / 2018-07-05
+===================
+
+  * Release v1.2.0
   * refactor part with typescript, add ci, and add test cases.
 
 v1.1.0 / 2017-09-27
