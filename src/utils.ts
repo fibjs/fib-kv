@@ -1,3 +1,5 @@
+/// <reference path="../@types/index.d.ts" />
+
 const SqlValueTypes: { [key: string /* SQL_VALUE_TYPE */]: true } = {
     'TINYBLOB': true,
     'BLOB': true,

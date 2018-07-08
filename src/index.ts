@@ -1,3 +1,5 @@
+/// <reference path="../@types/index.d.ts" />
+
 var util = require('util');
 var utils = require('./utils');
 var backendUtils = require('./backend/_utils')

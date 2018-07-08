@@ -1,3 +1,5 @@
+/// <reference path="../../@types/index.d.ts" />
+
 import utils = require('../utils');
 
 function _v(opts: FibKVOptions, value) {
