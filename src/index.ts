@@ -26,7 +26,7 @@ function backend(conn) {
     return _back || conn._back || conn;
 }
 
-function FibKV(conn, opts: FibKVOptions = {}) {
+function FibKV(conn, opts: FibKV.FibKVOptions = {}) {
     var cache;
     if (opts.cache) {
         cache = new util.LruCache(utils.cache_size(opts),

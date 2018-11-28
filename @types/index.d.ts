@@ -1,33 +1,34 @@
+declare namespace FibKV {
+    type ms = number
+    type SQL_VALUE_TYPE =
+        'TINYBLOB' | 'BLOB' | 'MEDIUMBLOB' | 'LONGBLOB' |
+        'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT' |
+        'VARCHAR'
 
-type ms = number
-type SQL_VALUE_TYPE = 
-    'TINYBLOB' | 'BLOB' | 'MEDIUMBLOB' | 'LONGBLOB' |
-    'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT' |
-    'VARCHAR'
+    interface FibKVOptions {
+        table_name?: string
+        key_name?: string
+        value_name?: string
+        key_size?: number
+        value_size?: number
+        pool_name?: string
+        cleanup_interval?: ms
+        timeout?: ms
+        prefix?: string
+        cache?: boolean
+        cache_size?: number
+        cache_timeout?: ms
 
-interface FibKVOptions {
-    table_name?: string
-    key_name?: string
-    value_name?: string
-    key_size?: number
-    value_size?: number
-    pool_name?: string
-    cleanup_interval?: ms
-    timeout?: ms
-    prefix?: string
-    cache?: boolean
-    cache_size?: number
-    cache_timeout?: ms
+        sql_value_type?: SQL_VALUE_TYPE
+    }
 
-    sql_value_type?: SQL_VALUE_TYPE
+    type FibKVValueType = string | any | null
 }
-
-type FibKVValueType = string | any | null
 
 declare class FibKVInstance {
     setup: () => void
-    get: (key: string) => FibKVValueType
-    set: (key: string, value: any) => FibKVValueType
+    get: (key: string) => FibKV.FibKVValueType
+    set: (key: string, value: any) => FibKV.FibKVValueType
     has: (key) => boolean
     keys: () => string[]
     renew: (key: string) => void
@@ -38,7 +39,7 @@ declare class FibKVInstance {
 
 declare module "fib-kv" {
     interface FibKVGenerator {
-        new (conn: any, opts: FibKVOptions): FibKVInstance;
+        new(conn: any, opts: FibKV.FibKVOptions): FibKVInstance;
     }
     export = FibKVGenerator
 }
