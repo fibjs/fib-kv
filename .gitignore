@@ -4,3 +4,4 @@ test.db
 package-lock.json
 
 config.local*
+lib/*

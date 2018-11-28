@@ -20,11 +20,12 @@
         "fibjs"
     ],
     "scripts": {
-        "build": "fib-typify src -o lib -c .typifyrc.json",
-        "ci": "fibjs test"
+        "build": "fib-typify src -o lib",
+        "test": "fibjs test",
+        "ci": "npm run build && npm run test"
     },
     "ci": {
-        "type": "travis",
+        "type": "travis, appveyor",
         "version": [
             "0.22.0",
             "0.23.0",
