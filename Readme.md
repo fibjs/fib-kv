@@ -1,4 +1,12 @@
-## general key-value store on sql/level/mongo/redis for fibjs
+# fib-kv
+
+[![NPM version](https://img.shields.io/npm/v/fib-kv.svg)](https://www.npmjs.org/package/fib-kv)
+[![Build Status](https://travis-ci.org/fibjs/fib-kv.svg)](https://travis-ci.org/fibjs/fib-kv)
+[![Build status](https://ci.appveyor.com/api/projects/status/they3hi2gq01vrev?svg=true)](https://ci.appveyor.com/project/richardo2016/fib-kv)
+
+## Introduction
+
+general key-value store on sql/level/mongo/redis for fibjs.
 
 ## Install
 
@@ -75,7 +83,6 @@ var pool = require("fib-pool");
 
 var kvs = new kv(pool(() => db.openLevelDB("test.ldb")));
 ```
-
 
 ## Methods
 
