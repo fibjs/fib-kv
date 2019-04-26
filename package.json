@@ -37,8 +37,11 @@
     },
     "devDependencies": {
         "@fibjs/ci": "^2.1.0",
-        "@types/fibjs": "^0.26.0",
-        "fib-pool": "^1.4.1",
-        "fib-typify": "^0.3.0"
+        "@fibjs/types": "0.0.3",
+        "fib-pool": "^1.5.3",
+        "fib-typify": "^0.5.2"
+    },
+    "peerDependencies": {
+        "fib-pool": ">= 1.5.3 < 2"
     }
 }

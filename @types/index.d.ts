@@ -1,3 +1,6 @@
+/// <reference types="@fibjs/types" />
+/// <reference types="fib-pool" />
+
 declare namespace FibKV {
     type ms = number
     type SQL_VALUE_TYPE =
@@ -23,23 +26,26 @@ declare namespace FibKV {
     }
 
     type FibKVValueType = string | any | null
-}
 
-declare class FibKVInstance {
-    setup: () => void
-    get: (key: string) => FibKV.FibKVValueType
-    set: (key: string, value: any) => FibKV.FibKVValueType
-    has: (key) => boolean
-    keys: () => string[]
-    renew: (key: string) => void
-    remove: (key: string) => void
-    cache_has: (key: string) => boolean
-    cache_clear: () => void
+    interface FibKVInstance {
+        setup: () => void
+        get: (key: string) => FibKV.FibKVValueType
+        set: (key: string, value: any) => FibKV.FibKVValueType
+        has: (key: string) => boolean
+        keys: () => string[]
+        renew: (key: string) => void
+        remove: (key: string) => void
+        cache_has: (key: string) => boolean
+        cache_clear: () => void
+    }
+
+    interface FibKVConstructor<T = Class_DbConnection> {
+        new (conn: T | FibPoolNS.FibPoolFunction<T>, opts: FibKV.FibKVOptions): FibKVInstance
+        prototype: FibKVInstance
+    }
 }
 
 declare module "fib-kv" {
-    interface FibKVGenerator {
-        new(conn: any, opts: FibKV.FibKVOptions): FibKVInstance;
-    }
-    export = FibKVGenerator
+    const mod: FibKV.FibKVConstructor
+    export = mod
 }

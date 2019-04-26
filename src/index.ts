@@ -1,10 +1,10 @@
 /// <reference path="../@types/index.d.ts" />
 
-var util = require('util');
-var utils = require('./utils');
-var backendUtils = require('./backend/_utils')
+import util = require('util');
+import utils = require('./utils');
+import backendUtils = require('./backend/_utils')
 
-var backends = {
+const backends = {
     Object: require('./backend/Object'),
     Map: require('./backend/Map'),
     LruCache: require('./backend/LruCache'),
@@ -15,53 +15,62 @@ var backends = {
     MySQL: require('./backend/sql')
 };
 
-function backend(conn) {
-    var t = Object.prototype.toString.call(conn);
-    var type = t.substr(8, t.length - 9)
+function backend(conn: Class_DbConnection) {
+    const t = Object.prototype.toString.call(conn);
+    let type = t.substr(8, t.length - 9)
     if (backendUtils.isMapNative() && conn instanceof Map) {
         type = 'Map'
     }
 
-    var _back = backends[type];
-    return _back || conn._back || conn;
+    const _back = backends[type];
+    return _back || (conn as any)._back || conn;
 }
 
-function FibKV(conn, opts: FibKV.FibKVOptions = {}) {
-    var cache;
+interface Cache extends Class_LruCache {
+    keys(): string[];
+    renew(k: string): any;
+    [k: string]: any
+}
+const FibKV = function <T = Class_DbConnection>(
+    this: FibKV.FibKVInstance,
+    conn: Class_DbConnection | FibPoolNS.FibPoolFunction<Class_DbConnection>, opts: FibKV.FibKVOptions = {}
+) {
+    let cache: Cache;
     if (opts.cache) {
-        cache = new util.LruCache(utils.cache_size(opts),
-            utils.cache_timeout(opts));
+        cache = <Cache>new util.LruCache(utils.cache_size(opts), utils.cache_timeout(opts));
         cache.keys = () => Object.keys(cache.toJSON());
-        cache.renew = k => cache.set(k, cache.get(k));
+        cache.renew = (k) => cache.set(k, cache.get(k));
     }
 
+    // fib-pool
     if (typeof conn === 'function') {
+        const pool = conn as FibPoolNS.FibPoolFunction<Class_DbConnection>
         util.extend(this, {
-            setup: () => conn(utils.pool_name(opts), c => backend(c).setup(c, opts)),
-            get: k => conn(utils.pool_name(opts), c => {
+            setup: () => pool(utils.pool_name(opts), c => backend(c).setup(c, opts)),
+            get: k => pool(utils.pool_name(opts), c => {
                 k = utils.prefix_key(k, opts);
-                return cache ? cache.get(k, k => backend(c).get(c, opts, k)) :
+                return cache ? cache.get(k, (k: string) => backend(c).get(c, opts, k)) :
                     backend(c).get(c, opts, k);
             }),
-            set: (k, v) => conn(utils.pool_name(opts), c => {
+            set: (k, v) => pool(utils.pool_name(opts), c => {
                 k = utils.prefix_key(k, opts);
                 if (cache)
                     cache.set(k, v);
                 backend(c).set(c, opts, k, v);
             }),
-            has: k => conn(utils.pool_name(opts), c => {
+            has: k => pool(utils.pool_name(opts), c => {
                 k = utils.prefix_key(k, opts);
                 return cache ? (cache.has(k) || backend(c).has(c, opts, k)) :
                     backend(c).has(c, opts, k);
             }),
-            keys: () => conn(utils.pool_name(opts), c => backend(c).keys(c, opts)),
-            renew: k => conn(utils.pool_name(opts), c => {
+            keys: () => pool(utils.pool_name(opts), c => backend(c).keys(c, opts)),
+            renew: k => pool(utils.pool_name(opts), c => {
                 k = utils.prefix_key(k, opts);
                 if (cache)
                     cache.renew(k);
                 backend(c).renew(c, opts, k);
             }),
-            remove: k => conn(utils.pool_name(opts), c => {
+            remove: k => pool(utils.pool_name(opts), c => {
                 k = utils.prefix_key(k, opts);
                 if (cache)
                     cache.remove(k);
@@ -69,9 +78,9 @@ function FibKV(conn, opts: FibKV.FibKVOptions = {}) {
             }),
             cache_has: k => cache && cache.has(utils.prefix_key(k, opts)),
             cache_clear: () => cache && cache.clear()
-        });
+        } as FibKV.FibKVInstance);
     } else {
-        var _back = backend(conn);
+        const _back = backend(conn);
 
         util.extend(this, {
             setup: () => {
@@ -79,7 +88,7 @@ function FibKV(conn, opts: FibKV.FibKVOptions = {}) {
             },
             get: k => {
                 k = utils.prefix_key(k, opts);
-                return cache ? cache.get(k, k => _back.get(conn, opts, k)) : _back.get(conn, opts, k);
+                return cache ? cache.get(k, (k: string) => _back.get(conn, opts, k)) : _back.get(conn, opts, k);
             },
             set: (k, v) => {
                 k = utils.prefix_key(k, opts);
@@ -106,8 +115,8 @@ function FibKV(conn, opts: FibKV.FibKVOptions = {}) {
             },
             cache_has: k => cache && cache.has(utils.prefix_key(k, opts)),
             cache_clear: () => cache && cache.clear()
-        });
+        } as FibKV.FibKVInstance);
     }
-}
+} as any as FibKV.FibKVConstructor
 
 export = FibKV;
