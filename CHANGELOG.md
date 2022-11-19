@@ -1,7 +1,13 @@
 
-v1.3.1 / 2019-04-26
+v1.3.2 / 2022-11-20
 ==================
 
+  * chore: update deps, adapt to fib-pool's types.
+
+v1.3.1 / 2019-04-26
+===================
+
+  * Release v1.3.1
   * upgrade dependencies.
   * update typo.
   * [README.md] add badgets
