@@ -40,7 +40,7 @@ declare namespace FibKV {
     }
 
     interface FibKVConstructor<T = Class_DbConnection> {
-        new (conn: T | FibPoolNS.FibPoolFunction<T>, opts: FibKV.FibKVOptions): FibKVInstance
+        new (conn: T | FibPoolNS.FibPool<T>, opts: FibKV.FibKVOptions): FibKVInstance
         prototype: FibKVInstance
     }
 }

@@ -25,23 +25,17 @@
         "ci": "npm run build && npm run test"
     },
     "ci": {
-        "type": "travis, appveyor",
+        "type": "actions, appveyor",
         "version": [
-            "0.22.0",
-            "0.23.0",
-            "0.24.0",
-            "0.25.0",
-            "0.26.0",
-            "0.26.1"
+            "0.33.0",
+            "0.34.0",
+            "0.35.0"
         ]
     },
     "devDependencies": {
-        "@fibjs/ci": "^2.1.0",
-        "@fibjs/types": "0.0.3",
-        "fib-pool": "^1.5.3",
-        "fib-typify": "^0.5.2"
-    },
-    "peerDependencies": {
-        "fib-pool": ">= 1.5.3 < 2"
+        "@fibjs/ci": "^2.6.0",
+        "@fibjs/types": "^0.35.0",
+        "fib-pool": "^1.6.0",
+        "fib-typify": "^0.11.4"
     }
 }

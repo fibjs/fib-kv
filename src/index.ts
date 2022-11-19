@@ -33,7 +33,7 @@ interface Cache extends Class_LruCache {
 }
 const FibKV = function <T = Class_DbConnection>(
     this: FibKV.FibKVInstance,
-    conn: Class_DbConnection | FibPoolNS.FibPoolFunction<Class_DbConnection>, opts: FibKV.FibKVOptions = {}
+    conn: Class_DbConnection | FibPoolNS.FibPool<Class_DbConnection>, opts: FibKV.FibKVOptions = {}
 ) {
     let cache: Cache;
     if (opts.cache) {
@@ -44,7 +44,7 @@ const FibKV = function <T = Class_DbConnection>(
 
     // fib-pool
     if (typeof conn === 'function') {
-        const pool = conn as FibPoolNS.FibPoolFunction<Class_DbConnection>
+        const pool = conn as FibPoolNS.FibPool<Class_DbConnection>
         util.extend(this, {
             setup: () => pool(utils.pool_name(opts), c => backend(c).setup(c, opts)),
             get: k => pool(utils.pool_name(opts), c => {
