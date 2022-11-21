@@ -15,7 +15,9 @@ const backends = {
     MySQL: require('./backend/sql')
 };
 
-function backend(conn: Class_DbConnection) {
+function backend(conn: FibKV.IConnection) {
+    if ((conn as any).custom_backend) return (conn as any).custom_backend;
+
     const t = Object.prototype.toString.call(conn);
     let type = t.substr(8, t.length - 9)
     if (backendUtils.isMapNative() && conn instanceof Map) {
@@ -31,9 +33,9 @@ interface Cache extends Class_LruCache {
     renew(k: string): any;
     [k: string]: any
 }
-const FibKV = function <T = Class_DbConnection>(
+const FibKV = function (
     this: FibKV.FibKVInstance,
-    conn: Class_DbConnection | FibPoolNS.FibPool<Class_DbConnection>, opts: FibKV.FibKVOptions = {}
+    conn: FibKV.IConnection | FibPoolNS.FibPool<FibKV.IConnection>, opts: FibKV.FibKVOptions = {}
 ) {
     let cache: Cache;
     if (opts.cache) {
@@ -44,7 +46,7 @@ const FibKV = function <T = Class_DbConnection>(
 
     // fib-pool
     if (typeof conn === 'function') {
-        const pool = conn as FibPoolNS.FibPool<Class_DbConnection>
+        const pool = conn as FibPoolNS.FibPool<FibKV.IConnection>
         util.extend(this, {
             setup: () => pool(utils.pool_name(opts), c => backend(c).setup(c, opts)),
             get: k => pool(utils.pool_name(opts), c => {

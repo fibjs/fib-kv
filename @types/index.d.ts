@@ -8,6 +8,12 @@ declare namespace FibKV {
         'TINYTEXT' | 'TEXT' | 'MEDIUMTEXT' | 'LONGTEXT' |
         'VARCHAR'
 
+    type IConnection = Class_DbConnection | {
+        custom_backend: any
+    }
+
+    type SqlConnection = Class_MySQL | Class_SQLite | Class_DbConnection;
+
     interface FibKVOptions {
         table_name?: string
         key_name?: string
