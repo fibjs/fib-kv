@@ -1,7 +1,13 @@
 
-v1.3.2 / 2022-11-20
+v1.3.3 / 2022-11-21
 ==================
 
+  * feat: better types, support custom_backend
+
+v1.3.2 / 2022-11-20
+===================
+
+  * Release v1.3.2
   * chore: update deps, adapt to fib-pool's types.
 
 v1.3.1 / 2019-04-26
