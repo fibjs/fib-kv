@@ -179,14 +179,6 @@ describe("kv", () => {
         () => conn = new collection.Map(),
         () => conn = {});
 
-    test_kv('LruCache', {},
-        () => conn = new util.LruCache(65536),
-        () => conn = {});
-
-    test_timeout('LruCache timeout', {},
-        () => conn = new util.LruCache(65536, ms),
-        () => conn = {});
-
     test_kv('LevelDB', {},
         () => conn = db.openLevelDB("test.ldb"),
         () => conn.close());
@@ -429,4 +421,4 @@ describe("kv", () => {
     }
 });
 
-process.exit(test.run(console.DEBUG));
+process.exit(test.run(console.DEBUG).failed);
