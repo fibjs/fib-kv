@@ -11,7 +11,8 @@ const backends = {
     MongoDB: require('./backend/MongoDB'),
     Redis: require('./backend/Redis'),
     SQLite: require('./backend/sql'),
-    MySQL: require('./backend/sql')
+    MySQL: require('./backend/sql'),
+    DbConnection: require('./backend/sql')
 };
 
 function backend(conn: FibKV.IConnection) {

@@ -28,7 +28,10 @@ function sql(opts: FibKV.FibKVOptions & {
     if (!sqls)
         sqls = opts.sqls = {
             get: `SELECT ${utils.value_name(opts)} FROM ${utils.table_name(opts)} WHERE ${utils.key_name(opts)} = ?${_v(opts, ` and _timestamp >= ?`)};`,
-            set: `REPLACE INTO ${utils.table_name(opts)} VALUES(?,?${_v(opts, `,?`)});`,
+            set: `INSERT INTO ${utils.table_name(opts)} (${utils.key_name(opts)}, ${utils.value_name(opts)}${_v(opts, `, _timestamp`)}) 
+                VALUES (?, ?${_v(opts, `, ?`)}) 
+                ON CONFLICT (${utils.key_name(opts)}) DO UPDATE 
+                SET ${utils.value_name(opts)} = excluded.${utils.value_name(opts)}${_v(opts, `, _timestamp = excluded._timestamp`)};`,
             has: `SELECT 1 FROM ${utils.table_name(opts)} WHERE ` +
                 `${utils.key_name(opts)} = ?${_v(opts, ` and _timestamp >= ?`)};`,
             keys: `SELECT ${utils.key_name(opts)} FROM ${utils.table_name(opts)}${_v(opts, ` WHERE _timestamp >= ?`)};`,
